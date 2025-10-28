@@ -29,9 +29,11 @@ class Complaint(db.Model):
     public_link = db.Column(db.String(100), unique=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
+@app.before_request
+def create_tables_once():
+    if not getattr(app, '_tables_created', False):
+        db.create_all()
+        app._tables_created = True
 
 @app.route('/')
 def index():
